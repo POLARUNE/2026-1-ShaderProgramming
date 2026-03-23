@@ -1,9 +1,14 @@
 #version 330
 
 uniform float u_Time; // uniform은 CPU에서 직접 shader로 값을 전달할 때 사용
+uniform float u_OffsetX;
 
 in vec3 a_Position; // attribute에서 받아온 값, vbo 거쳐서 들어옴
+in float a_Mass;
+in vec2 a_Vel;
 
+const float c_PI = 3.141592;
+const float c_G = -9.8;
 
 void sin1()
 {
@@ -41,7 +46,8 @@ void circle()
 	gl_Position = newPosition;
 }
 
-void star(){
+void star()
+{
 	// 별의 궤적을 계산하기 위한 변수
     // 속도 조절을 위해 u_Time에 적당한 상수를 곱합니다.
     float t = u_Time * 5.0; 
@@ -62,11 +68,50 @@ void star(){
     newPosition.z = a_Position.z;
     newPosition.w = 1.0;
     
-    gl_Position = newPosition;}
+    gl_Position = newPosition;
+}
 
+void Falling()
+{
+	float t = mod(u_Time, 1.0); // 0 ~ 1 구간 반복
+	float tt = t*t;
+	float vx, vy;
+	vx = a_Vel.x;
+	vy = a_Vel.y;
 
+	vec4 newPos;
+	newPos.x = a_Position.x + vx*t;
+	newPos.y = a_Position.y + vy*t + 0.5*c_G*tt;
+	newPos.z = 0;
+	newPos.w = 1;
+
+	gl_Position = newPos;
+}
+
+void Falling2()
+{
+    // 1.0초마다 반복
+    float t = mod(u_Time, 1.0); 
+    float tt = t * t;
+    
+    // a_Vel.x는 기본 방향, u_OffsetX는 개별 사각형의 랜덤 방향성
+    // 두 값을 조합하여 각 사각형마다 다른 가로 속도를 갖게 합니다.
+    float vx = a_Vel.x * u_OffsetX * 2.0; // 2.0은 퍼지는 너비를 조절하는 배율
+    float vy = a_Vel.y;
+
+    vec4 newPos;
+    // X축: 시작점(a_Position.x)은 고정, 시간에 따라 vx 방향으로 퍼짐
+    newPos.x = a_Position.x + (vx * t);
+    
+    // Y축: 위로 솟구쳤다가 중력으로 떨어짐
+    newPos.y = a_Position.y + (vy * t) + (0.5 * c_G * tt);
+    newPos.z = 0.0;
+    newPos.w = 1.0;
+
+    gl_Position = newPos;
+}
 
 void main()
 {
-	star();
+	Falling2();
 }
