@@ -76,7 +76,7 @@ void Renderer::CreateVertexBufferObjects()
 	// 파티클 VBO 생성
 	const int particleCount = 1000;
 	const int verticesPerRect = 6;
-	const int floatsPerVertex = 7; // pos(3) + mass(1) + vel(2) + RV(1)
+	const int floatsPerVertex = 9; // pos(3) + mass(1) + vel(2) + RV(1) + RV1(1) + RV2(1)
 	std::vector<float> particleData;
 
 	for (int i = 0; i < particleCount; i++) {
@@ -84,17 +84,19 @@ void Renderer::CreateVertexBufferObjects()
 		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
 		float rv_y = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 		float RV = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float RV1 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float RV2 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 
 
 		// 사각형 정점 6개 정의 (Triangle 2개)
 		float v[verticesPerRect * floatsPerVertex] = {
-		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV,
-		centerX + size / 2,	centerY - size / 2,0, mass, rv_x, rv_y, RV,
-		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, //triangle1
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
+		centerX + size / 2,	centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,	//triangle1
 
-		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV,
-		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV,
-		centerX - size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, //triangle2
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
+		centerX - size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,	//triangle2
 		};
 		particleData.insert(particleData.end(), v, v + (verticesPerRect * floatsPerVertex));
 	}
@@ -276,30 +278,40 @@ void Renderer::DrawParticles(int count)
 	int attribMass = glGetAttribLocation(m_ParticleShader, "a_Mass");
 	int attribVel = glGetAttribLocation(m_ParticleShader, "a_Vel");
 	int attribRV = glGetAttribLocation(m_ParticleShader, "a_RV");
+	int attribRV1 = glGetAttribLocation(m_ParticleShader, "a_RV1");
+	int attribRV2 = glGetAttribLocation(m_ParticleShader, "a_RV2");
 
 	glEnableVertexAttribArray(attribPos);
 	glEnableVertexAttribArray(attribMass);
 	glEnableVertexAttribArray(attribVel);
 	glEnableVertexAttribArray(attribRV);
+	glEnableVertexAttribArray(attribRV1);
+	glEnableVertexAttribArray(attribRV2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
-	// 한 정점의 크기는 float 7개 (pos 3 + mass 1 + vel 2 + RV 1)
-	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
+	// 한 정점의 크기는 float 9개 (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1)
+	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	
-	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 3));
 
-	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 4));
+	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 4));
 
-	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 6));
 
-	// 7개의 정점 * 파티클 개수
+	glVertexAttribPointer(attribRV1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 7));
+
+	glVertexAttribPointer(attribRV2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 8));
+
+	// 6개의 정점 * 파티클 개수
 	glDrawArrays(GL_TRIANGLES, 0, 6 * count);
 
 	glDisableVertexAttribArray(attribPos);
 	glDisableVertexAttribArray(attribMass);
 	glDisableVertexAttribArray(attribVel);
 	glDisableVertexAttribArray(attribRV);
+	glDisableVertexAttribArray(attribRV1);
+	glDisableVertexAttribArray(attribRV2);
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)

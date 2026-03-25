@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{25179D6C-FA85-4619-8EDB-AC241382F6CA}|SimpleGame\\SimpleGame.vcxproj|solutionrelative:SimpleGame\\Shaders\\Triangle.vs||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{25179D6C-FA85-4619-8EDB-AC241382F6CA}|SimpleGame\\SimpleGame.vcxproj|C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.fs||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{25179D6C-FA85-4619-8EDB-AC241382F6CA}|SimpleGame\\SimpleGame.vcxproj|solutionrelative:SimpleGame\\Shaders\\Triangle.fs||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{25179D6C-FA85-4619-8EDB-AC241382F6CA}|SimpleGame\\SimpleGame.vcxproj|C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\SimpleGame.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{25179D6C-FA85-4619-8EDB-AC241382F6CA}|SimpleGame\\SimpleGame.vcxproj|solutionrelative:SimpleGame\\SimpleGame.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -26,37 +30,50 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
+              "Title": "Triangle.fs",
+              "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.fs",
+              "RelativeDocumentMoniker": "SimpleGame\\Shaders\\Triangle.fs",
+              "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.fs",
+              "RelativeToolTip": "SimpleGame\\Shaders\\Triangle.fs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-25T02:08:10.775Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Triangle.vs",
+              "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.vs",
+              "RelativeDocumentMoniker": "SimpleGame\\Shaders\\Triangle.vs",
+              "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.vs",
+              "RelativeToolTip": "SimpleGame\\Shaders\\Triangle.vs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-25T00:41:57.29Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Renderer.cpp",
               "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Renderer.cpp",
               "RelativeDocumentMoniker": "SimpleGame\\Renderer.cpp",
               "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Renderer.cpp",
               "RelativeToolTip": "SimpleGame\\Renderer.cpp",
-              "ViewState": "AgIAAEQAAAAAAAAAAAAAAEwAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEBAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-09T04:27:50.174Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SimpleGame.cpp",
-              "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\SimpleGame.cpp",
-              "RelativeDocumentMoniker": "SimpleGame\\SimpleGame.cpp",
-              "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\SimpleGame.cpp",
-              "RelativeToolTip": "SimpleGame\\SimpleGame.cpp",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-03-09T04:28:21.731Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Renderer.h",
               "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Renderer.h",
               "RelativeDocumentMoniker": "SimpleGame\\Renderer.h",
@@ -69,15 +86,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Triangle.vs",
-              "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.vs",
-              "RelativeDocumentMoniker": "SimpleGame\\Shaders\\Triangle.vs",
-              "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\Shaders\\Triangle.vs",
-              "RelativeToolTip": "SimpleGame\\Shaders\\Triangle.vs",
-              "ViewState": "AgIAAEAAAAAAAAAAAAAAwFYAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-03-11T02:09:14.88Z",
+              "DocumentIndex": 2,
+              "Title": "SimpleGame.cpp",
+              "DocumentMoniker": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\SimpleGame.cpp",
+              "RelativeDocumentMoniker": "SimpleGame\\SimpleGame.cpp",
+              "ToolTip": "C:\\Users\\\uC774\uC9C4\uC218\\Documents\\\uB300\uD559 \uC218\uC5C5 \uC790\uB8CC \uBC0F \uACFC\uC81C\\\uC804\uACF5\\2026 1\uD559\uAE30 \uC170\uC774\uB354\uD504\uB85C\uADF8\uB798\uBC0D\\2026-1-ShaderProgramming\\BaseProject\\SimpleGame\\SimpleGame.cpp",
+              "RelativeToolTip": "SimpleGame\\SimpleGame.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-09T04:28:21.731Z",
               "EditorCaption": ""
             }
           ]
