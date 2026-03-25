@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Renderer.h"
+#include <vector>
 #include <ctime>
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
 }
-
 
 Renderer::~Renderer()
 {
@@ -25,13 +25,6 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	//Create VBOs
 	CreateVertexBufferObjects();
-	m_VBOParticle = m_VBOTriangle; // 기존 사각형 VBO 재사용
-
-	// 랜덤 시드 설정 및 초기화
-	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 100; i++) {
-		m_ParticleXOffset[i] = ((rand() % 2001) - 1000) / 1000.0f;
-	}
 
 	if (m_SolidRectShader > 0 && m_VBORect > 0)
 	{
@@ -59,7 +52,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	float centerX = 0;
 	float centerY = 0;
-	float size = 0.1; // 사각형 길이의 절반
+	float size = 0.05; // 사각형 길이의 절반
 	float mass = 1;
 	float vx = 1;
 	float vy = 1;
@@ -78,6 +71,37 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBOTriangle);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTriangle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
+	
+	//=====================================================================
+	// 파티클 VBO 생성
+	const int particleCount = 1000;
+	const int verticesPerRect = 6;
+	const int floatsPerVertex = 7; // pos(3) + mass(1) + vel(2) + RV(1)
+	std::vector<float> particleData;
+
+	for (int i = 0; i < particleCount; i++) {
+		// 각 파티클마다 고유한 랜덤 속도를 생성 (이게 핵심!)
+		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
+		float rv_y = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float RV = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+
+
+		// 사각형 정점 6개 정의 (Triangle 2개)
+		float v[verticesPerRect * floatsPerVertex] = {
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV,
+		centerX + size / 2,	centerY - size / 2,0, mass, rv_x, rv_y, RV,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, //triangle1
+
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV,
+		centerX - size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, //triangle2
+		};
+		particleData.insert(particleData.end(), v, v + (verticesPerRect * floatsPerVertex));
+	}
+
+	glGenBuffers(1, &m_VBOParticle);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
+	glBufferData(GL_ARRAY_BUFFER, particleData.size() * sizeof(float), particleData.data(), GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -242,49 +266,40 @@ void Renderer::DrawTriangle()
 
 void Renderer::DrawParticles(int count)
 {
-	// static 변수로 이전 프레임의 정수 초를 저장
-	static int lastSecond = -1;
-
-	g_time += 0.0003;
-
-	// 현재 정수 초 계산
-	int currentSecond = (int)floor(g_time);
-
-	// 1초가 경과하여 정수 초가 바뀌었다면 랜덤 오프셋 재생성
-	if (currentSecond != lastSecond) {
-		for (int i = 0; i < 100; i++) {
-			// -1.0 ~ 1.0 사이의 새로운 랜덤값 생성
-			m_ParticleXOffset[i] = ((rand() % 2001) - 1000) / 1000.0f;
-		}
-		lastSecond = currentSecond; // 현재 초를 저장하여 중복 실행 방지
-	}
+	g_time += 0.0003f; // 시간 업데이트
 
 	glUseProgram(m_ParticleShader);
 
-	// 셰이더에 현재 시간 전달 (셰이더 내부에서 mod(u_Time, 1.0) 처리)
 	glUniform1f(glGetUniformLocation(m_ParticleShader, "u_Time"), g_time);
 
-	int uOffsetLoc = glGetUniformLocation(m_ParticleShader, "u_OffsetX");
-	int attribPosition = glGetAttribLocation(m_ParticleShader, "a_Position");
+	int attribPos = glGetAttribLocation(m_ParticleShader, "a_Position");
+	int attribMass = glGetAttribLocation(m_ParticleShader, "a_Mass");
 	int attribVel = glGetAttribLocation(m_ParticleShader, "a_Vel");
+	int attribRV = glGetAttribLocation(m_ParticleShader, "a_RV");
 
-	glEnableVertexAttribArray(attribPosition);
+	glEnableVertexAttribArray(attribPos);
+	glEnableVertexAttribArray(attribMass);
 	glEnableVertexAttribArray(attribVel);
+	glEnableVertexAttribArray(attribRV);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
-	// Stride 6 (pos 3, mass 1, vel 2) 기준
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 4));
+	// 한 정점의 크기는 float 7개 (pos 3 + mass 1 + vel 2 + RV 1)
+	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
+	
+	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 3));
 
-	// 갱신된(혹은 유지된) 랜덤 오프셋으로 그리기
-	for (int i = 0; i < count; i++) {
-		glUniform1f(uOffsetLoc, m_ParticleXOffset[i]);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-	}
+	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 4));
 
-	glDisableVertexAttribArray(attribPosition);
+	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 6));
+
+	// 7개의 정점 * 파티클 개수
+	glDrawArrays(GL_TRIANGLES, 0, 6 * count);
+
+	glDisableVertexAttribArray(attribPos);
+	glDisableVertexAttribArray(attribMass);
 	glDisableVertexAttribArray(attribVel);
+	glDisableVertexAttribArray(attribRV);
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)

@@ -36,7 +36,6 @@ private:
 	GLuint m_VBOTriangle = 0;
 	GLuint m_TriangleShader = 0;
 
-	float m_ParticleXOffset[100];
 	GLuint m_VBOParticle = 0;
 	GLuint m_ParticleShader = 0;
 };

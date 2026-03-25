@@ -1,11 +1,17 @@
 #version 330
 
 uniform float u_Time; // uniform은 CPU에서 직접 shader로 값을 전달할 때 사용
-uniform float u_OffsetX;
+
 
 in vec3 a_Position; // attribute에서 받아온 값, vbo 거쳐서 들어옴
 in float a_Mass;
 in vec2 a_Vel;
+in float a_RV; //랜덤값
+
+float random(float seed)
+{
+	return fract(sin(seed) * 43758.5453123);
+}
 
 const float c_PI = 3.141592;
 const float c_G = -9.8;
@@ -46,31 +52,6 @@ void circle()
 	gl_Position = newPosition;
 }
 
-void star()
-{
-	// 별의 궤적을 계산하기 위한 변수
-    // 속도 조절을 위해 u_Time에 적당한 상수를 곱합니다.
-    float t = u_Time * 5.0; 
-    
-    // 별 모양의 매개변수 방정식 (Star Curve)
-    // 외경과 내경의 차이를 이용하여 별 모양을 만듭니다.
-    // 5개의 모서리를 가지는 별 궤적:
-    float r = 0.7; // 별의 크기 (화면에 꽉 차게 0.8 ~ 1.0 사이 조절)
-    
-    // x, y 좌표를 별 모양 궤적 수식으로 정의
-    float x_offset = r * (cos(t) + cos(2.0/3.0 * t) * 0.5); 
-    float y_offset = r * (sin(t) - sin(2.0/3.0 * t) * 0.5);
-
-    vec4 newPosition;
-    // a_Position이 (0,0)이므로 offset 값이 곧 중심 좌표가 됩니다.
-    newPosition.x = a_Position.x + x_offset;
-    newPosition.y = a_Position.y + y_offset;
-    newPosition.z = a_Position.z;
-    newPosition.w = 1.0;
-    
-    gl_Position = newPosition;
-}
-
 void Falling()
 {
 	float t = mod(u_Time, 1.0); // 0 ~ 1 구간 반복
@@ -88,23 +69,61 @@ void Falling()
 	gl_Position = newPos;
 }
 
-void Falling2()
+void RoundPop() 
 {
-    // 1.0초마다 반복
+    // 1. 시간 계산 (0~1초 반복)
     float t = mod(u_Time, 1.0); 
     float tt = t * t;
-    
-    // a_Vel.x는 기본 방향, u_OffsetX는 개별 사각형의 랜덤 방향성
-    // 두 값을 조합하여 각 사각형마다 다른 가로 속도를 갖게 합니다.
-    float vx = a_Vel.x * u_OffsetX * 2.0; // 2.0은 퍼지는 너비를 조절하는 배율
+
+    // 2. 원형 시작점(Origin) 계산
+    // a_RV(0~1)에 2*PI를 곱해 완전한 원(0~360도)의 각도를 만듦
+    float angle = a_RV * 2.0 * c_PI; 
+    float radius = 0.8; // 원의 반지름
+
+    // 원주 위의 한 점 (시작 위치)
+    float sx = cos(angle) * radius;
+    float sy = sin(angle) * radius;
+
+    // 3. 속도 설정 (VBO에서 넘어온 랜덤 속도)
+    float vx = a_Vel.x;
     float vy = a_Vel.y;
 
     vec4 newPos;
-    // X축: 시작점(a_Position.x)은 고정, 시간에 따라 vx 방향으로 퍼짐
-    newPos.x = a_Position.x + (vx * t);
+
+    // 원의 테두리(sx, sy)에서 운동 시작
+    newPos.x = a_Position.x + sx + (vx * t);
+    newPos.y = a_Position.y + sy + (vy * t) + (0.5 * c_G * tt);
+    newPos.z = 0.0;
+    newPos.w = 1.0;
+
+    gl_Position = newPos;
+}
+
+void RoundPop2() 
+{
+    // 1. 각도 계산: 0~1 사이의 a_RV를 시계 방향 각도로 변환
+    // 윗부분(PI/2)에서 시작하여 시계 방향(-)으로 회전
+    float angle = (c_PI / 2.0) - (a_RV * 2.0 * c_PI);
     
-    // Y축: 위로 솟구쳤다가 중력으로 떨어짐
-    newPos.y = a_Position.y + (vy * t) + (0.5 * c_G * tt);
+    float radius = 0.8; // 원의 반지름
+    float sx = cos(angle) * radius;
+    float sy = sin(angle) * radius;
+
+    // 2. 지연 시간 로직: a_RV가 클수록 나중에 터짐
+    // u_Time이 1초 주기라고 가정할 때, a_RV만큼의 오프셋을 줍니다.
+    float t = mod(u_Time - a_RV, 1.0); 
+    float tt = t * t;
+
+    // 3. 속도 설정
+    float vx = a_Vel.x;
+    float vy = a_Vel.y;
+
+    vec4 newPos;
+
+    // 4. 최종 위치 계산
+    // t가 0에 가까울수록(막 터지는 순간) sx, sy 위치에 있게 됩니다.
+    newPos.x = a_Position.x + sx + (vx * t);
+    newPos.y = a_Position.y + sy + (vy * t) + (0.5 * c_G * tt);
     newPos.z = 0.0;
     newPos.w = 1.0;
 
@@ -113,5 +132,5 @@ void Falling2()
 
 void main()
 {
-	Falling2();
+	RoundPop2();
 }
