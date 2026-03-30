@@ -22,6 +22,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
 	m_TriangleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
 	m_ParticleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
+	m_FSShader = CompileShaders("./Shaders/FS.vs", "./Shaders/FS.fs");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -104,6 +105,22 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBOParticle);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 	glBufferData(GL_ARRAY_BUFFER, particleData.size() * sizeof(float), particleData.data(), GL_STATIC_DRAW);
+
+	//=====================================================================	
+	//fragment
+	float rectFS[] = // x, y, z, tx, ty : stride 5
+	{
+		-1.f, -1.f, 0.f, 0, 1,
+		1.f,  1.f,  0.f, 1, 0,
+		-1.f, 1.f,  0.f, 0, 0,//Triangle1
+		-1.f, -1.f, 0.f, 0, 1,
+		1.f,  -1.f, 0.f, 1, 1,
+		1.f,   1.f, 0.f, 1, 0//Triangle2
+	};
+
+	glGenBuffers(1, &m_VBOFS);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectFS), rectFS, GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -264,6 +281,10 @@ void Renderer::DrawTriangle()
 	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (GLvoid*)(sizeof(float) * 4));
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(attribMass);
+	glDisableVertexAttribArray(attribVel);
 }
 
 void Renderer::DrawParticles(int count)
@@ -314,6 +335,31 @@ void Renderer::DrawParticles(int count)
 	glDisableVertexAttribArray(attribRV2);
 }
 
+void Renderer::DrawFS()
+{
+	g_time += 0.0003;
+	//Program select
+	GLuint shader = m_FSShader;
+	glUseProgram(shader);
+
+	int uTime = glGetUniformLocation(shader, "u_Time");
+	glUniform1f(uTime, g_time);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Pos");
+	int attribTPos = glGetAttribLocation(shader, "a_TPos");
+	
+	glEnableVertexAttribArray(attribPosition);
+	glEnableVertexAttribArray(attribTPos);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(attribTPos, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(attribTPos);
+}
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 {
 	*newX = x * 2.f / m_WindowSizeX;
