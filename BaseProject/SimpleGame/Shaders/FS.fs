@@ -129,8 +129,57 @@ void FractalPattern() {
     FragColor = vec4(finalColor, 1.0);
 }
 
+void Flag() {
+	float amp = 0.5; // 柳气
+	float speed = 15;
+	float sinInput = v_TPos.x * c_PI * 2 - u_Time * speed;
+	float sinValue = v_TPos.x * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
+
+	float fWidth = 0.0; // 标惯 场 何盒 气 汲沥
+	float width = 0.5 * mix(1, fWidth, v_TPos.x);
+	float grey = 0;
+
+
+	if (v_TPos.y < sinValue + width/2 && v_TPos.y > sinValue - width/2)
+	{
+		grey = 1;
+	}
+
+	else {
+		grey = 0;
+		discard;
+	}
+
+	FragColor = vec4(grey);
+}
+
+void Flame() {
+	float amp = 0.5; // 柳气
+	float speed = 15;
+	float newY = 1 - v_TPos.y;
+	float sinInput = newY * c_PI * 2 - u_Time * speed;
+	float sinValue = newY * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
+
+	float fWidth = 0.0; // 标惯 场 何盒 气 汲沥
+	float width = 0.5 * mix(fWidth, 1, newY);
+	float grey = 0;
+
+
+	if (v_TPos.x < sinValue + width/2 && v_TPos.x > sinValue - width/2)
+	{
+		grey = 1;
+	}
+
+	else {
+		grey = 0;
+		discard;
+	}
+
+	FragColor = vec4(grey);
+}
+
 void main()
 {
-	Raindrop();
+	Flame();
 	//FractalPattern();
 }
