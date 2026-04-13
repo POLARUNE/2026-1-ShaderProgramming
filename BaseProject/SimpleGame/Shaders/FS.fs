@@ -6,6 +6,8 @@ in vec2 v_TPos;
 
 uniform float u_Time;
 
+uniform vec4 u_DropInfo[1000]; //vec4(x, y, sT, lT)
+
 const float c_PI = 3.141592;
 
 void Simple(){
@@ -44,7 +46,6 @@ void Circle1(){
 	if (d > radius - lineWidth && d < radius)
 	{
 		FragColor = vec4(v_TPos.xy, 1, 1);
-		
 	}
 	else
 	{
@@ -58,6 +59,37 @@ void Circle2(){
 	float d = distance(center, currpos);
 	float value = abs(sin(d * c_PI * 16 - u_Time*20));
 	FragColor = vec4(pow(value, 16));
+}
+
+void Raindrop(){
+	float accum = 0;
+
+	for (int i = 0; i < 1000; i++) {
+		float lTime = u_DropInfo[i].w; //라이프타임
+		float sTime = u_DropInfo[i].z; //시작 시간
+		float newTime = u_Time - sTime;
+
+		if (newTime > 0) {
+			newTime = fract(newTime/lTime); //0~1
+			float oneMinus = 1 - newTime; //1~0
+			float t = newTime * lTime;
+
+			vec2 center = u_DropInfo[i].xy;
+			vec2 currpos = v_TPos.xy;
+
+			float range = t/2;
+			float d = distance(center, currpos);
+
+			float fade = 5 * clamp(range - d, 0, 1);
+
+			float value = pow(abs(sin(d * 2 * c_PI * 8 - t*100)), 16); // 8은 물방울의 개수, t는 시간에 따른 변화량
+			accum += value * fade * oneMinus;
+		}
+
+		else {
+		}
+	}
+	FragColor = vec4(accum);
 }
 
 // 회전 행렬을 생성하는 보조 함수
@@ -99,5 +131,6 @@ void FractalPattern() {
 
 void main()
 {
-	FractalPattern();
+	Raindrop();
+	//FractalPattern();
 }

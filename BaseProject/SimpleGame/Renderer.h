@@ -40,7 +40,11 @@ private:
 	GLuint m_VBOParticle = 0;
 	GLuint m_ParticleShader = 0;
 
+	//Fragment Shader
 	GLuint m_VBOFS = 0;
 	GLuint m_FSShader = 0;
+
+	//RainDrops
+	float m_DropPoints[1000 * 4];
 };
 
