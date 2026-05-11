@@ -8,7 +8,10 @@ uniform float u_Time;
 
 uniform vec4 u_DropInfo[1000]; //vec4(x, y, sT, lT)
 
-uniform sampler2D u_RGBTex;
+uniform sampler2D u_RGBTex; // 0
+uniform sampler2D u_CurrNumTex;
+uniform sampler2D u_NumsTex;
+uniform int u_InputNum;
 
 const float c_PI = 3.141592;
 
@@ -201,8 +204,83 @@ void TextureSampling() {
 	FragColor = sum;
 }
 
+void TextureQ1() {
+	float tx = v_TPos.x;
+	float ty = 1 - 2 * abs(v_TPos.y - 0.5); // y좌표를 0~1 범위에서 0~1~0 범위로 변환
+	vec2 newTex = vec2(tx, ty);
+
+	FragColor = texture(u_RGBTex, newTex);
+}
+
+void TextureQ2() {
+	float tx = fract(v_TPos.x * 3);
+	float ty = v_TPos.y/3;
+
+	float offsetX = 0;
+	float offsetY = (2 - floor(v_TPos.x * 3))/3;
+
+	vec2 newTex = vec2(tx+offsetX, ty+offsetY);
+
+	FragColor = texture(u_RGBTex, newTex);
+}
+
+void TextureQ3() {
+	float tx = fract(v_TPos.x * 3);
+	float ty = v_TPos.y/3;
+
+	float offsetX = 0;
+	float offsetY = floor(v_TPos.x * 3)/3;
+
+	vec2 newTex = vec2(tx+offsetX, ty+offsetY);
+
+	FragColor = texture(u_RGBTex, newTex);
+}
+
+void TextureQ4() {
+	float resolX = 5; //반복되는 개수
+	float resolY = 5;
+	float shear = 0.5 * u_Time;
+
+	float offsetX = fract(ceil(v_TPos.y * resolY) * shear); //offset
+	float offsetY = 0;
+
+	float tx = fract(v_TPos.x * resolX + offsetX); //range
+	float ty = fract(v_TPos.y * resolY + offsetY);
+
+
+	vec2 newTex = vec2(tx, ty);
+
+	FragColor = texture(u_RGBTex, newTex);
+}
+
+
+void Num() {
+	float tx = v_TPos.x;
+	float ty = v_TPos.y;
+
+	float offsetX = 0;
+	float offsetY = 0;
+
+	vec2 newTex = vec2(tx+offsetX, ty+offsetY);
+
+	FragColor = texture(u_CurrNumTex, newTex);
+}
+
+void Nums() {
+	float index = float(u_InputNum);
+	float tx = v_TPos.x / 5;
+	float ty = v_TPos.y / 2;
+
+	float offsetX = fract(index/5.0);
+	float offsetY = floor(index/5.0)/2.0;
+
+	vec2 newTex = vec2(tx+offsetX, ty+offsetY);
+
+	FragColor = texture(u_NumsTex, newTex);
+}
+
 void main()
 {
-	TextureSampling();
+	Nums();
 	//FractalPattern();
 }
