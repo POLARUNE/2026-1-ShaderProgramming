@@ -31,6 +31,9 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Load Textures
 	m_RgbTexture = CreatePngTexture("./Textures/rgb.png", GL_NEAREST); // 0 slot
 	m_NumsTexture = CreatePngTexture("./Textures/numbers.png", GL_NEAREST); // 1 slot
+	m_ParticleTexture = CreatePngTexture("./Textures/particle.png", GL_NEAREST);
+	m_ParticleSpriteTexture = CreatePngTexture("./Textures/explosion.png", GL_NEAREST);
+
 	for(int i = 0; i < 10; i++)
 	{
 		std::string path = "./Textures/" + std::to_string(i) + ".png";
@@ -137,28 +140,34 @@ void Renderer::CreateVertexBufferObjects()
 	// 파티클 VBO 생성
 	const int particleCount = 1000;
 	const int verticesPerRect = 6;
-	const int floatsPerVertex = 9; // pos(3) + mass(1) + vel(2) + RV(1) + RV1(1) + RV2(1)
+	const int floatsPerVertex = 14; // pos(3) + mass(1) + vel(2) + RV(1) + RV1(1) + RV2(1) + tx(1) + ty(1) + r,g,b (3)
 	std::vector<float> particleData;
 
 	for (int i = 0; i < particleCount; i++) {
 		// 각 파티클마다 고유한 랜덤 속도를 생성 (이게 핵심!)
 		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
-		float rv_y = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
 		float RV = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 		float RV1 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 		float RV2 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float R = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float G = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float B = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 
 
 		// 사각형 정점 6개 정의 (Triangle 2개)
 		float v[verticesPerRect * floatsPerVertex] = {
-		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
-		centerX + size / 2,	centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
-		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,	//triangle1
+		//triangle1
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,0,0,R,G,B,
+		centerX + size / 2,	centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,1,0,R,G,B,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,1,1,R,G,B,
 
-		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
-		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,
-		centerX - size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,	//triangle2
+		//triangle2
+		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,0,0,R,G,B,
+		centerX + size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,1,1,R,G,B,
+		centerX - size / 2, centerY + size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,0,1,R,G,B,
 		};
+
 		particleData.insert(particleData.end(), v, v + (verticesPerRect * floatsPerVertex));
 	}
 
@@ -349,11 +358,27 @@ void Renderer::DrawTriangle()
 
 void Renderer::DrawParticles(int count)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	g_time += 0.0003f; // 시간 업데이트
 
 	glUseProgram(m_ParticleShader);
 
-	glUniform1f(glGetUniformLocation(m_ParticleShader, "u_Time"), g_time);
+	int uTime = glGetUniformLocation(m_ParticleShader, "u_Time");
+	glUniform1f(uTime, g_time);
+
+	int uParticle = glGetUniformLocation(m_ParticleShader, "u_ParticleTex");
+	glUniform1i(uParticle, 0);
+
+	int uParticleSprite = glGetUniformLocation(m_ParticleShader, "u_ParticleSpriteTex");
+	glUniform1i(uParticleSprite, 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_ParticleTexture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_ParticleSpriteTexture);
 
 	int attribPos = glGetAttribLocation(m_ParticleShader, "a_Position");
 	int attribMass = glGetAttribLocation(m_ParticleShader, "a_Mass");
@@ -361,6 +386,9 @@ void Renderer::DrawParticles(int count)
 	int attribRV = glGetAttribLocation(m_ParticleShader, "a_RV");
 	int attribRV1 = glGetAttribLocation(m_ParticleShader, "a_RV1");
 	int attribRV2 = glGetAttribLocation(m_ParticleShader, "a_RV2");
+	int attribTex = glGetAttribLocation(m_ParticleShader, "a_Tex");
+	int attribRGB = glGetAttribLocation(m_ParticleShader, "a_RGB");
+
 
 	glEnableVertexAttribArray(attribPos);
 	glEnableVertexAttribArray(attribMass);
@@ -368,21 +396,28 @@ void Renderer::DrawParticles(int count)
 	glEnableVertexAttribArray(attribRV);
 	glEnableVertexAttribArray(attribRV1);
 	glEnableVertexAttribArray(attribRV2);
+	glEnableVertexAttribArray(attribTex);
+	glEnableVertexAttribArray(attribRGB);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
-	// 한 정점의 크기는 float 9개 (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1)
-	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	// 한 정점의 크기는 float 14개 (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1 + tx 1 + ty 1 + rgb 3)
+	int stride = 14;
+	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, 0);
 	
-	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 3));
 
-	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 4));
+	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 4));
 
-	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 6));
 
-	glVertexAttribPointer(attribRV1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 7));
+	glVertexAttribPointer(attribRV1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 7));
 
-	glVertexAttribPointer(attribRV2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 8));
+	glVertexAttribPointer(attribRV2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 8));
+
+	glVertexAttribPointer(attribTex, 2, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 9));
+
+	glVertexAttribPointer(attribRGB, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 11));
 
 	// 6개의 정점 * 파티클 개수
 	glDrawArrays(GL_TRIANGLES, 0, 6 * count);
@@ -393,6 +428,8 @@ void Renderer::DrawParticles(int count)
 	glDisableVertexAttribArray(attribRV);
 	glDisableVertexAttribArray(attribRV1);
 	glDisableVertexAttribArray(attribRV2);
+
+	glDisable(GL_BLEND);
 }
 
 int g_CurrNum = 0;

@@ -11,8 +11,12 @@ in vec2 a_Vel;
 in float a_RV; // 0 ~ 1 ·£´ý°ª (Random Value)
 in float a_RV1; // 0 ~ 1 ·£´ý°ª (Random Value)
 in float a_RV2; // 0 ~ 1 ·£´ý°ª (Random Value)
+in vec2 a_Tex;
+in vec3 a_RGB;
 
 out float v_Grey;
+out vec3 v_Color;
+out vec2 v_Tex;
 
 float random(float seed)
 {
@@ -235,10 +239,46 @@ void RoundPop2()
     gl_Position = newPos;
 }
 
+
+// void VS_01_Æ²(){ // Å¸¿ø
+//	  vec4 newPosition = vec4(0, 0, 0, 1);
+//	  newPosition.x = a_Position.x + 
+//	  newPosition.y = a_Position.y + 
+//	  gl_Position = newPosition;
+// }
+
+void Shape()
+{
+	float lifeTime = 0.5 + 5.0 * a_RV;
+	float startTime = 5.0 * a_RV1;
+
+	float newTime = u_Time - startTime;
+
+	if (newTime > 0) {
+		float t = fract(newTime/lifeTime)*lifeTime;
+		float tt = t*t;
+
+		float newX = a_Position.x + a_Vel.x*t;
+		float newY = a_Position.y + a_Vel.y*t;
+
+		gl_Position = vec4(newX, newY, 0, 1);
+		v_Grey = 1-fract(newTime/lifeTime);
+	}
+	else {
+		gl_Position = vec4(-10000, 0, 0, 1);
+		v_Grey = 1;	
+	}
+
+	v_Color = a_RGB;
+	v_Tex = a_Tex;
+}
+
 void main()
 {
 	//Falling();
 	//RoundFalling();
 	//RoundPop2();
-	sin3();
+	//sin3();
+	Shape();
+	
 }

@@ -25,8 +25,8 @@ void RenderScene(void)
 	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
 	//g_Renderer->DrawTriangle();
-	//g_Renderer->DrawParticles(1000);
-	g_Renderer->DrawFS();
+	g_Renderer->DrawParticles(1000);
+	//g_Renderer->DrawFS();
 	glutSwapBuffers();
 }
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	}
 
 	// Initialize Renderer
-	g_Renderer = new Renderer(700, 700);
+	g_Renderer = new Renderer(720, 720);
 	if (!g_Renderer->IsInitialized())
 	{
 		std::cout << "Renderer could not be initialized.. \n";

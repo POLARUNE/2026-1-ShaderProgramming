@@ -279,8 +279,56 @@ void Nums() {
 	FragColor = texture(u_NumsTex, newTex);
 }
 
+void FS_01_Q6() {
+	float tx = fract(v_TPos.x*3); //0~1 0~1 0~1
+	float ty = v_TPos.y/3;
+	float offsetX = 0;
+	float offsetY = abs(floor(v_TPos.x * 3)/3 - 2);
+	FragColor = texture(u_RGBTex, vec2(tx+offsetX, ty+offsetY));
+}
+
+void FS_01_Q7() {
+	//	G
+	//	B
+	//	R
+	float tx = v_TPos.x;
+	float ty = fract(v_TPos.y*3)/3; //0~1/3 0~1/3 0~1/3 
+	float offsetX = 0;
+	float offsetY = 0;
+	FragColor = texture(u_RGBTex, vec2(tx+offsetX, ty+offsetY));
+}
+
+void FS_01_Q8() {
+	float tx = v_TPos.x/5; //범위만
+	float ty = v_TPos.y/2;
+	float offsetX = 2.0/5.0; //위치
+	float offsetY = 1.0/2.0;
+	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
+}
+
+void FS_01_Q9() {
+	float tx = v_TPos.x/5 * 2; //범위만
+	float ty = v_TPos.y/2;
+	float offsetX = 2.0/5.0; //위치
+	float offsetY = 0;
+	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
+}
+
+void FS_01_Q10() {
+	float index = float(8);
+
+	float tx = v_TPos.x/5; //범위만
+	float ty = v_TPos.y/2;
+
+	float offsetX = fract(index/5.0); //위치, fract: 소수부분만 남김
+	float offsetY = floor(index/5.0)/2.0;
+
+	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
+}
+
 void main()
 {
-	Nums();
+	//Nums();
+	FS_01_Q10();
 	//FractalPattern();
 }
