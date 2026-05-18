@@ -25,8 +25,9 @@ void RenderScene(void)
 	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
 	//g_Renderer->DrawTriangle();
-	g_Renderer->DrawParticles(1000);
+	//g_Renderer->DrawParticles(1000);
 	//g_Renderer->DrawFS();
+	g_Renderer->DrawDummy();
 	glutSwapBuffers();
 }
 

@@ -18,6 +18,7 @@ public:
 	void DrawTriangle();
 	void DrawParticles(int count);
 	void DrawFS();
+	void DrawDummy();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -28,6 +29,8 @@ private:
 	void GetGLPosition(float x, float y, float *newX, float *newY);
 
 	GLuint CreatePngTexture(char* filePath, GLuint samplingMethod);
+
+	void GenDummyMesh(int x, int y);
 
 	bool m_Initialized = false;
 	
@@ -57,5 +60,11 @@ private:
 
 	GLuint m_ParticleTexture = 0;
 	GLuint m_ParticleSpriteTexture = 0;
+
+	//Dummy Vertex
+	GLuint m_VBODummy = 0;
+	GLuint m_VBODummyCount = 0;
+
+	GLuint m_DummyShader = 0;
 };
 

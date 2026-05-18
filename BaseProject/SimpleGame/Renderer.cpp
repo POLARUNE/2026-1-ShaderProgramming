@@ -27,6 +27,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_TriangleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
 	m_ParticleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
 	m_FSShader = CompileShaders("./Shaders/FS.vs", "./Shaders/FS.fs");
+	m_DummyShader = CompileShaders("./Shaders/Dummy.vs", "./Shaders/Dummy.fs");
 
 	//Load Textures
 	m_RgbTexture = CreatePngTexture("./Textures/rgb.png", GL_NEAREST); // 0 slot
@@ -42,6 +43,9 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	//Create VBOs
 	CreateVertexBufferObjects();
+
+	//Create Dummy
+	GenDummyMesh(16, 16);
 
 	//빗방울	정보 초기화 (x, y, startTime, lifeTime)
 	int index = 0;
@@ -116,7 +120,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	float centerX = 0;
 	float centerY = 0;
-	float size = 0.05; // 사각형 길이의 절반
+	float size = 0.3; // size: 사각형 길이의 절반
 	float mass = 1;
 	float vx = 1;
 	float vy = 1;
@@ -144,7 +148,7 @@ void Renderer::CreateVertexBufferObjects()
 	std::vector<float> particleData;
 
 	for (int i = 0; i < particleCount; i++) {
-		// 각 파티클마다 고유한 랜덤 속도를 생성 (이게 핵심!)
+		// 각 파티클마다 고유한 랜덤 속도를 생성
 		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
 		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
 		float RV = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
@@ -509,4 +513,99 @@ void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 {
 	*newX = x * 2.f / m_WindowSizeX;
 	*newY = y * 2.f / m_WindowSizeY;
+}
+
+void Renderer::GenDummyMesh(int resolX, int resolY)
+{
+	float basePosX = -0.5f;
+	float basePosY = -0.5f;
+	float targetPosX = 0.5f; 
+	float targetPosY = 0.5f;
+	int pointCountX = resolX;
+	int pointCountY = resolY;
+
+	float width = targetPosX - basePosX; 
+	float height = targetPosY - basePosY;
+
+	float* point = new float[pointCountX * pointCountY * 2];
+	float* vertices = new float[(pointCountX - 1) * (pointCountY - 1) * 2 * 3 * 3]; 
+
+	m_VBODummyCount = (pointCountX - 1) * (pointCountY - 1) * 2 * 3; 
+	
+	//Prepare points
+	for (int x = 0; x < pointCountX; x++) {
+		for (int y = 0; y < pointCountY; y++) { point[(y * pointCountX + x) * 2 + 0] = basePosX + width * (x / (float)(pointCountX - 1)); 
+		point[(y * pointCountX + x) * 2 + 1] = basePosY + height * (y / (float)(pointCountY - 1)); }
+	}
+	
+	//Make triangles
+	int vertIndex = 0; 
+	for (int x = 0; x < pointCountX - 1; x++) {
+		for (int y = 0; y < pointCountY - 1; y++) {
+			//Triangle part 1
+			vertices[vertIndex] = point[(y * pointCountX + x) * 2 + 0]; 
+			vertIndex++; 
+			vertices[vertIndex] = point[(y * pointCountX + x) * 2 + 1]; 
+			vertIndex++;
+			vertices[vertIndex] = 0.f; 
+			vertIndex++; 
+			vertices[vertIndex] = point[((y + 1) * pointCountX + (x + 1)) * 2 + 0];
+			vertIndex++;
+			vertices[vertIndex] = point[((y + 1) * pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f;
+			vertIndex++; 
+			vertices[vertIndex] = point[((y + 1) * pointCountX + x) * 2 + 0]; 
+			vertIndex++; 
+			vertices[vertIndex] = point[((y + 1) * pointCountX + x) * 2 + 1]; 
+			vertIndex++; 
+			vertices[vertIndex] = 0.f; 
+			vertIndex++; 
+			
+			//Triangle part 2
+			vertices[vertIndex] = point[(y * pointCountX + x) * 2 + 0]; 
+			vertIndex++; 
+			vertices[vertIndex] = point[(y * pointCountX + x) * 2 + 1]; 
+			vertIndex++; 
+			vertices[vertIndex] = 0.f; 
+			vertIndex++;
+			vertices[vertIndex] = point[(y * pointCountX + (x + 1)) * 2 + 0]; 
+			vertIndex++; 
+			vertices[vertIndex] = point[(y * pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f; 
+			vertIndex++; 
+			vertices[vertIndex] = point[((y + 1) * pointCountX + (x + 1)) * 2 + 0]; 
+			vertIndex++; 
+			vertices[vertIndex] = point[((y + 1) * pointCountX + (x + 1)) * 2 + 1];
+			vertIndex++;
+			vertices[vertIndex] = 0.f; 
+			vertIndex++;
+		}
+	}
+	glGenBuffers(1, &m_VBODummy);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBODummy);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_VBODummyCount * 3, vertices, GL_STATIC_DRAW);
+}
+
+void Renderer::DrawDummy()
+{
+	//Program select
+	int shader = m_DummyShader;
+	glUseProgram(m_DummyShader);
+
+	int uTime = glGetUniformLocation(shader, "u_Time");
+	glUniform1f(uTime, g_time);
+	g_time += 0.0016;
+
+	int attribPosition = glGetAttribLocation(m_DummyShader, "a_Pos");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBODummy);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, m_VBODummyCount);
+
+	glDisableVertexAttribArray(attribPosition);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

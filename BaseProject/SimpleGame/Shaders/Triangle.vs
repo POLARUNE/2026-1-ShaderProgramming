@@ -258,8 +258,8 @@ void Shape()
 		float t = fract(newTime/lifeTime)*lifeTime;
 		float tt = t*t;
 
-		float newX = a_Position.x + a_Vel.x*t;
-		float newY = a_Position.y + a_Vel.y*t;
+		float newX = a_Position.x + a_Vel.x * t;
+		float newY = a_Position.y + a_Vel.y * t;
 
 		gl_Position = vec4(newX, newY, 0, 1);
 		v_Grey = 1-fract(newTime/lifeTime);
