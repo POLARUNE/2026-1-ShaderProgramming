@@ -70,8 +70,8 @@ void Raindrop(){
 	float accum = 0;
 
 	for (int i = 0; i < 1000; i++) {
-		float lTime = u_DropInfo[i].w; //������Ÿ��
-		float sTime = u_DropInfo[i].z; //���� �ð�
+		float lTime = u_DropInfo[i].w; //라이프타임
+		float sTime = u_DropInfo[i].z; //시작 시간
 		float newTime = u_Time - sTime;
 
 		if (newTime > 0) {
@@ -87,7 +87,7 @@ void Raindrop(){
 
 			float fade = 5 * clamp(range - d, 0, 1);
 
-			float value = pow(abs(sin(d * 2 * c_PI * 8 - t*100)), 16); // 8�� ������� ����, t�� �ð��� ���� ��ȭ��
+			float value = pow(abs(sin(d * 2 * c_PI * 8 - t*100)), 16); // 8은 물방울의 개수, t는 시간에 따른 변화량
 			accum += value * fade * oneMinus;
 		}
 
@@ -97,36 +97,36 @@ void Raindrop(){
 	FragColor = vec4(accum);
 }
 
-// ȸ�� ����� �����ϴ� ���� �Լ�
+// 회전 행렬을 생성하는 보조 함수
 mat2 rotate2d(float angle) {
     return mat2(cos(angle), -sin(angle),
                 sin(angle),  cos(angle));
 }
 
 void FractalPattern() {
-    // 1. ��ǥ ����ȭ (0~1 ������ -1~1 ������ �����Ͽ� �߾� ����)
+    // 1. 좌표 정규화 (0~1 범위를 -1~1 범위로 변경하여 중앙 정렬)
     vec2 uv = (v_TPos - 0.5) * 2.0;
     
-    // �ð��� �帧�� ���� ��ü���� ȸ�� �߰�
+     // 시간의 흐름에 따라 전체적인 회전 추가
     uv *= rotate2d(u_Time * 0.2);
 
     vec3 finalColor = vec3(0.0);
 
-    // 2. ����Ż �ݺ� ���� (���� Ƚ���� ���������� ��������)
+    // 2. 프랙탈 반복 루프 (루프 횟수가 많아질수록 복잡해짐)
     for (float i = 0.0; i < 4.0; i++) {
-        // ��ǥ ���� (ȭ���� �ɰ���)
+        // 좌표 복제 (화면을 쪼개기)
         uv = fract(uv * 1.5) - 0.5;
 
-        // ���� �Ÿ� ��� (Circle2�� �Ÿ� ���� ����)
+        // 원형 거리 계산 (Circle2의 거리 개념 응용)
         float d = length(uv) * exp(-length(v_TPos - 0.5));
 
-        // ���� ���� (��ġ�� �ð��� ���� ��ȭ)
+        // 색상 결정 (위치와 시간에 따른 변화)
         vec3 col = 0.5 + 0.5 * cos(u_Time + i * 0.5 + vec3(0, 2, 4));
 
-        // �׿� ���� ȿ�� (LinePattern�� sin/pow ���� ����)
+        // 네온 라인 효과 (LinePattern의 sin/pow 개념 응용)
         d = sin(d * 8.0 + u_Time) / 8.0;
         d = abs(d);
-        d = pow(0.01 / d, 1.2); // ������ �� ȿ��
+        d = pow(0.01 / d, 1.2); // 빛나는 선 효과
 
         finalColor += col * d;
     }
@@ -135,12 +135,12 @@ void FractalPattern() {
 }
 
 void Flag() {
-	float amp = 0.5; // ����
+	float amp = 0.5; // 진폭
 	float speed = 15;
 	float sinInput = v_TPos.x * c_PI * 2 - u_Time * speed;
 	float sinValue = v_TPos.x * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
 
-	float fWidth = 0.0; // ��� �� �κ� �� ����
+	float fWidth = 0.0; // 깃발 끝 부분 폭 설정
 	float width = 0.5 * mix(1, fWidth, v_TPos.x);
 	float grey = 0;
 
@@ -159,13 +159,13 @@ void Flag() {
 }
 
 void Flame() {
-	float amp = 0.5; // ����
+	float amp = 0.5; // 진폭
 	float speed = 15;
 	float newY = 1 - v_TPos.y;
 	float sinInput = newY * c_PI * 2 - u_Time * speed;
 	float sinValue = newY * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
 
-	float fWidth = 0.0; // ��� �� �κ� �� ����
+	float fWidth = 0.0; // 깃발 끝 부분 폭 설정
 	float width = 0.5 * mix(fWidth, 1, newY);
 	float grey = 0;
 
@@ -206,7 +206,7 @@ void TextureSampling() {
 
 void TextureQ1() {
 	float tx = v_TPos.x;
-	float ty = 1 - 2 * abs(v_TPos.y - 0.5); // y��ǥ�� 0~1 �������� 0~1~0 ������ ��ȯ
+	float ty = 1 - 2 * abs(v_TPos.y - 0.5); // y좌표를 0~1 범위에서 0~1~0 범위로 변환
 	vec2 newTex = vec2(tx, ty);
 
 	FragColor = texture(u_RGBTex, newTex);
@@ -237,7 +237,7 @@ void TextureQ3() {
 }
 
 void TextureQ4() {
-	float resolX = 5; //�ݺ��Ǵ� ����
+	float resolX = 5; //반복되는 개수
 	float resolY = 5;
 	float shear = 0.5 * u_Time;
 
@@ -299,17 +299,17 @@ void FS_01_Q7() {
 }
 
 void FS_01_Q8() {
-	float tx = v_TPos.x/5; //������
+	float tx = v_TPos.x/5; //범위만
 	float ty = v_TPos.y/2;
-	float offsetX = 2.0/5.0; //��ġ
+	float offsetX = 2.0/5.0; //위치
 	float offsetY = 1.0/2.0;
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
 }
 
 void FS_01_Q9() {
-	float tx = v_TPos.x/5 * 2; //������
+	float tx = v_TPos.x/5 * 2; //범위만
 	float ty = v_TPos.y/2;
-	float offsetX = 2.0/5.0; //��ġ
+	float offsetX = 2.0/5.0; //위치
 	float offsetY = 0;
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
 }
@@ -317,10 +317,10 @@ void FS_01_Q9() {
 void FS_01_Q10() {
 	float index = float(8);
 
-	float tx = v_TPos.x/5; //������
+	float tx = v_TPos.x/5; //범위만
 	float ty = v_TPos.y/2;
 
-	float offsetX = fract(index/5.0); //��ġ, fract: �Ҽ��κи� ����
+	float offsetX = fract(index/5.0); //위치, fract: 소수 부분만 남김
 	float offsetY = floor(index/5.0)/2.0;
 
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));

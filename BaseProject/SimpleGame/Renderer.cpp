@@ -28,6 +28,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_ParticleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
 	m_FSShader = CompileShaders("./Shaders/FS.vs", "./Shaders/FS.fs");
 	m_DummyShader = CompileShaders("./Shaders/Dummy.vs", "./Shaders/Dummy.fs");
+	m_TextureShader = CompileShaders("./Shaders/Texture.vs", "./Shaders/Texture.fs");
 
 	//Load Textures
 	m_RgbTexture = CreatePngTexture("./Textures/rgb.png", GL_NEAREST); // 0 slot
@@ -46,9 +47,12 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	CreateVertexBufferObjects();
 
 	//Create Dummy
-	GenDummyMesh(16, 16);
+	GenDummyMesh(200, 200);
 
-	//�����	���� �ʱ�ȭ (x, y, startTime, lifeTime)
+	//FBO
+	GenFBOs();
+
+	//빗방울	정보 초기화 (x, y, startTime, lifeTime)
 	int index = 0;
 	for (int i = 0; i < 1000; i++)
 	{
@@ -57,7 +61,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 		float sTime = 3 * (float)rand() / (float)RAND_MAX; // 0 ~ 3
 		float lTime = (float)rand() / (float)RAND_MAX;     // 0 ~ 1
 
-		// index ���� �ϳ��� ����Ͽ� ���������� ä��
+		// index 변수 하나만 사용하여 순차적으로 채움
 		m_DropPoints[index++] = x;
 		m_DropPoints[index++] = y;
 		m_DropPoints[index++] = sTime;
@@ -121,7 +125,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	float centerX = 0;
 	float centerY = 0;
-	float size = 0.3; // size: �簢�� ������ ����
+	float size = 0.3; // size: 사각형 길이의 절반
 	float mass = 1;
 	float vx = 1;
 	float vy = 1;
@@ -142,25 +146,25 @@ void Renderer::CreateVertexBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
 	
 	//=====================================================================
-	// ��ƼŬ VBO ����
+	// 파티클 VBO 생성
 	const int particleCount = 1000;
 	const int verticesPerRect = 6;
 	const int floatsPerVertex = 14; // pos(3) + mass(1) + vel(2) + RV(1) + RV1(1) + RV2(1) + tx(1) + ty(1) + r,g,b (3)
 	std::vector<float> particleData;
 
 	for (int i = 0; i < particleCount; i++) {
-		// �� ��ƼŬ���� ������ ���� �ӵ��� ����
-		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // ����: -1.0 ~ 1.0
-		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // ����: -1.0 ~ 1.0
-		float RV = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
-		float RV1 = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
-		float RV2 = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
-		float R = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
-		float G = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
-		float B = (rand() % 1001) / 1000.0f; // ����: 0.0 ~ 1.0
+		// 각 파티클마다 고유한 랜덤 속도를 생성
+		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
+		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // 범위: -1.0 ~ 1.0
+		float RV = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float RV1 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float RV2 = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float R = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float G = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
+		float B = (rand() % 1001) / 1000.0f; // 범위: 0.0 ~ 1.0
 
 
-		// �簢�� ���� 6�� ���� (Triangle 2��)
+		// 사각형 정점 6개 정의 (Triangle 2개)
 		float v[verticesPerRect * floatsPerVertex] = {
 		//triangle1
 		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,0,0,R,G,B,
@@ -195,11 +199,29 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBOFS);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rectFS), rectFS, GL_STATIC_DRAW);
+
+	//=====================================================================
+	//texture
+	float texRect[]
+		=
+	{
+		-1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		1.0f,  1.0f, 0.0f,
+
+		-1.0f, -1.0f, 0.0f,
+		1.0f,  1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f
+	};
+
+	glGenBuffers(1, &m_TextureVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_TextureVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texRect), texRect, GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
-	//���̴� ������Ʈ ����
+	//쉐이더 오브젝트 생성
 	GLuint ShaderObj = glCreateShader(ShaderType);
 
 	if (ShaderObj == 0) {
@@ -210,25 +232,25 @@ void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
 	p[0] = pShaderText;
 	GLint Lengths[1];
 	Lengths[0] = strlen(pShaderText);
-	//���̴� �ڵ带 ���̴� ������Ʈ�� �Ҵ�
+	//쉐이더 코드를 쉐이더 오브젝트에 할당
 	glShaderSource(ShaderObj, 1, p, Lengths);
 
-	//�Ҵ�� ���̴� �ڵ带 ������
+	//할당된 쉐이더 코드를 컴파일
 	glCompileShader(ShaderObj);
 
 	GLint success;
-	// ShaderObj �� ���������� ������ �Ǿ����� Ȯ��
+	// ShaderObj 가 성공적으로 컴파일 되었는지 확인
 	glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		GLchar InfoLog[1024];
 
-		//OpenGL �� shader log �����͸� ������
+		//OpenGL 의 shader log 데이터를 가져옴
 		glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
 		fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
 		printf("%s \n", pShaderText);
 	}
 
-	// ShaderProgram �� attach!!
+	// ShaderProgram 에 attach!!
 	glAttachShader(ShaderProgram, ShaderObj);
 }
 
@@ -251,43 +273,43 @@ bool Renderer::ReadFile(char* filename, std::string *target)
 
 GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 {
-	GLuint ShaderProgram = glCreateProgram(); //�� ���̴� ���α׷� ����
+	GLuint ShaderProgram = glCreateProgram(); //빈 쉐이더 프로그램 생성
 
-	if (ShaderProgram == 0) { //���̴� ���α׷��� ����������� Ȯ��
+	if (ShaderProgram == 0) { //쉐이더 프로그램이 만들어졌는지 확인
 		fprintf(stderr, "Error creating shader program\n");
 	}
 
 	std::string vs, fs;
 
-	//shader.vs �� vs ������ �ε���
+	//shader.vs 가 vs 안으로 로딩됨
 	if (!ReadFile(filenameVS, &vs)) {
 		printf("Error compiling vertex shader\n");
 		return -1;
 	};
 
-	//shader.fs �� fs ������ �ε���
+	//shader.fs 가 fs 안으로 로딩됨
 	if (!ReadFile(filenameFS, &fs)) {
 		printf("Error compiling fragment shader\n");
 		return -1;
 	};
 
-	// ShaderProgram �� vs.c_str() ���ؽ� ���̴��� �������� ����� attach��
+	// ShaderProgram 에 vs.c_str() 버텍스 쉐이더를 컴파일한 결과를 attach함
 	AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
 
-	// ShaderProgram �� fs.c_str() �����׸�Ʈ ���̴��� �������� ����� attach��
+	// ShaderProgram 에 fs.c_str() 프레그먼트 쉐이더를 컴파일한 결과를 attach함
 	AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
 	GLint Success = 0;
 	GLchar ErrorLog[1024] = { 0 };
 
-	//Attach �Ϸ�� shaderProgram �� ��ŷ��
+	//Attach 완료된 shaderProgram 을 링킹함
 	glLinkProgram(ShaderProgram);
 
-	//��ũ�� �����ߴ��� Ȯ��
+	//링크가 성공했는지 확인
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 
 	if (Success == 0) {
-		// shader program �α׸� �޾ƿ�
+		// shader program 로그를 받아옴
 		glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
 		std::cout << filenameVS << ", " << filenameFS << " Error linking shader program\n" << ErrorLog;
 		return -1;
@@ -328,7 +350,6 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 
 	glDisableVertexAttribArray(attribPosition);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 float g_time = 0;
@@ -366,7 +387,7 @@ void Renderer::DrawParticles(int count)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	g_time += 0.0003f; // �ð� ������Ʈ
+	g_time += 0.0003f; // 시간 업데이트
 
 	glUseProgram(m_ParticleShader);
 
@@ -406,7 +427,7 @@ void Renderer::DrawParticles(int count)
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
-	// �� ������ ũ��� float 14�� (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1 + tx 1 + ty 1 + rgb 3)
+	// 한 정점의 크기는 float 14개 (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1 + tx 1 + ty 1 + rgb 3)
 	int stride = 14;
 	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, 0);
 	
@@ -424,7 +445,7 @@ void Renderer::DrawParticles(int count)
 
 	glVertexAttribPointer(attribRGB, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 11));
 
-	// 6���� ���� * ��ƼŬ ����
+	// 6개의 정점 * 파티클 개수
 	glDrawArrays(GL_TRIANGLES, 0, 6 * count);
 
 	glDisableVertexAttribArray(attribPos);
@@ -457,7 +478,7 @@ void Renderer::DrawFS()
 	g_CurrNum++;
 	if (g_CurrNum > 9)
 		g_CurrNum = 0;
-	Sleep(500);
+	//Sleep(500);
 
 	int uInputNum = glGetUniformLocation(shader, "u_InputNum");
 	glUniform1i(uInputNum, g_CurrNum);
@@ -593,7 +614,7 @@ void Renderer::DrawDummy()
 {
 	//Program select
 	int shader = m_DummyShader;
-	glUseProgram(m_DummyShader);
+	glUseProgram(shader);
 
 	int uTime = glGetUniformLocation(shader, "u_Time");
 	glUniform1f(uTime, g_time);
@@ -604,6 +625,9 @@ void Renderer::DrawDummy()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_AhnTexture);
 
+	int uPoints = glGetUniformLocation(shader, "u_DropInfo");
+	glUniform4fv(uPoints, 1000, m_DropPoints);
+
 	int attribPosition = glGetAttribLocation(m_DummyShader, "a_Pos");
 	glEnableVertexAttribArray(attribPosition);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBODummy);
@@ -613,5 +637,144 @@ void Renderer::DrawDummy()
 
 	glDisableVertexAttribArray(attribPosition);
 
+	DrawTexture(m_RgbTexture, 0.5, 0, 0.1, true);
+
+}
+
+void Renderer::DrawTexture(GLuint texID, float x, float y, float scale,bool flip)
+{
+	//Program select
+	int shader = m_TextureShader;
+	glUseProgram(shader);
+
+	int uTex = glGetUniformLocation(shader, "u_Tex");
+	glUniform1i(uTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	int uTrans = glGetUniformLocation(shader, "u_Trans");
+	glUniform4f(uTrans, x, y, 1, scale);
+
+	int uFlip = glGetUniformLocation(shader, "u_Flip");
+	glUniform1i(uFlip, flip);
+
+	int aPos = glGetAttribLocation(shader, "a_Pos");
+	glEnableVertexAttribArray(aPos);
+	glBindBuffer(GL_ARRAY_BUFFER, m_TextureVBO);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+}
+
+void Renderer::GenFBOs()
+{
+	glGenTextures(1, &m_FBO_Texture);
+	glBindTexture(GL_TEXTURE_2D, m_FBO_Texture);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	//Render Buffer
+	GLuint depthBuffer;
+	glGenRenderbuffers(1, &depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	//GenFBO
+	glGenFramebuffers(1, &m_FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FBO_Texture, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+	//=====================================================================
+	glGenTextures(1, &m_FBO_Texture1);
+	glBindTexture(GL_TEXTURE_2D, m_FBO_Texture1);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	//Render Buffer
+	glGenRenderbuffers(1, &depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	//GenFBO
+	glGenFramebuffers(1, &m_FBO1);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO1);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FBO_Texture1, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+	//======================================================================
+	glGenTextures(1, &m_FBO_Texture2);
+	glBindTexture(GL_TEXTURE_2D, m_FBO_Texture2);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	//Render Buffer
+	glGenRenderbuffers(1, &depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	//GenFBO
+	glGenFramebuffers(1, &m_FBO2);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO2);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FBO_Texture2, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+
+
+
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		assert(0);
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::DrawDummy_FBO()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glViewport(0, 0, 512, 512);
+	DrawDummy();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 1024, 1024);
+	DrawTexture(m_FBO_Texture, 0, 0, 0.5, false);
+}
+
+void Renderer::DrawAll_FBO()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+	glViewport(0, 0, 512, 512);
+	DrawFS();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO1);
+	glViewport(0, 0, 512, 512);
+	DrawParticles(1000);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO2);
+	glViewport(0, 0, 512, 512);
+	DrawDummy();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 1024, 1024);
+
+	DrawTexture(m_FBO_Texture, -0.5, 0, 0.3, false);
+	DrawTexture(m_FBO_Texture1, 0, 0, 0.3, false);
+	DrawTexture(m_FBO_Texture2, 0.5, 0, 0.3, false);
 }

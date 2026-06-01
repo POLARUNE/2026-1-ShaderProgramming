@@ -27,7 +27,8 @@ void RenderScene(void)
 	//g_Renderer->DrawTriangle();
 	//g_Renderer->DrawParticles(1000);
 	//g_Renderer->DrawFS();
-	g_Renderer->DrawDummy();
+	//g_Renderer->DrawDummy_FBO();
+	g_Renderer->DrawAll_FBO();
 	glutSwapBuffers();
 }
 
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(1024, 1024);
 	glutCreateWindow("Game Software Engineering KPU");
 
 	glewInit();

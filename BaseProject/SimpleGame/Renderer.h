@@ -19,6 +19,8 @@ public:
 	void DrawParticles(int count);
 	void DrawFS();
 	void DrawDummy();
+	void DrawDummy_FBO();
+	void DrawAll_FBO();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -31,6 +33,10 @@ private:
 	GLuint CreatePngTexture(char* filePath, GLuint samplingMethod);
 
 	void GenDummyMesh(int x, int y);
+
+	void DrawTexture(GLuint texID, float x, float y, float scale, bool flip);
+
+	void GenFBOs();
 
 	bool m_Initialized = false;
 	
@@ -68,5 +74,19 @@ private:
 	GLuint m_VBODummyCount = 0;
 
 	GLuint m_DummyShader = 0;
+
+	//Texture API
+	GLuint m_TextureShader = 0;
+	GLuint m_TextureVBO = 0;
+
+	//FBO
+	GLuint m_FBO = 0;
+	GLuint m_FBO_Texture = 0;
+
+	GLuint m_FBO1 = 0;
+	GLuint m_FBO_Texture1 = 0;
+
+	GLuint m_FBO2 = 0;
+	GLuint m_FBO_Texture2 = 0;
 };
 

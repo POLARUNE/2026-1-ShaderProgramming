@@ -9,8 +9,7 @@ in vec2 v_Tex;
 
 const float c_PI = 3.141592;
 
-mat2 rotate2D(float radian)
-{
+mat2 rotate2D(float radian) {
 	return mat2(cos(radian), -sin(radian), sin(radian), cos(radian));
 }
 
@@ -29,13 +28,13 @@ float LinePattern(){
 	return (grey+grey1);
 }
 
+void flag()
+{	
+	//vec2 newTex = rotate2D(-c_PI/2.0) * v_Tex;
+	FragColor =  texture(u_AhnTex, v_Tex);
+}
+
 void main()
 {
 	FragColor = vec4(v_Grey);
-
-	FragColor = vec4(v_Tex, 0.0, 1.0);
-
-	//vec2 newTex = rotate2D(-c_PI/2.0) * v_Tex;
-
-	FragColor =  texture(u_AhnTex, v_Tex);
 }
