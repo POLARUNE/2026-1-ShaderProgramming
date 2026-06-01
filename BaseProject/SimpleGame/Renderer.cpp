@@ -34,6 +34,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_NumsTexture = CreatePngTexture("./Textures/numbers.png", GL_NEAREST); // 1 slot
 	m_ParticleTexture = CreatePngTexture("./Textures/particle.png", GL_NEAREST);
 	m_ParticleSpriteTexture = CreatePngTexture("./Textures/explosion.png", GL_NEAREST);
+	m_AhnTexture = CreatePngTexture("./Textures/ahn.png", GL_NEAREST);
 
 	for(int i = 0; i < 10; i++)
 	{
@@ -47,7 +48,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Create Dummy
 	GenDummyMesh(16, 16);
 
-	//ºø¹æ¿ï	Á¤º¸ ÃÊ±âÈ­ (x, y, startTime, lifeTime)
+	//ï¿½ï¿½ï¿½ï¿½ï¿½	ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ (x, y, startTime, lifeTime)
 	int index = 0;
 	for (int i = 0; i < 1000; i++)
 	{
@@ -56,7 +57,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 		float sTime = 3 * (float)rand() / (float)RAND_MAX; // 0 ~ 3
 		float lTime = (float)rand() / (float)RAND_MAX;     // 0 ~ 1
 
-		// index º¯¼ö ÇÏ³ª¸¸ »ç¿ëÇÏ¿© ¼øÂ÷ÀûÀ¸·Î Ã¤¿ò
+		// index ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½
 		m_DropPoints[index++] = x;
 		m_DropPoints[index++] = y;
 		m_DropPoints[index++] = sTime;
@@ -120,7 +121,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	float centerX = 0;
 	float centerY = 0;
-	float size = 0.3; // size: »ç°¢Çü ±æÀÌÀÇ Àý¹Ý
+	float size = 0.3; // size: ï¿½ç°¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float mass = 1;
 	float vx = 1;
 	float vy = 1;
@@ -141,25 +142,25 @@ void Renderer::CreateVertexBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
 	
 	//=====================================================================
-	// ÆÄÆ¼Å¬ VBO »ý¼º
+	// ï¿½ï¿½Æ¼Å¬ VBO ï¿½ï¿½ï¿½ï¿½
 	const int particleCount = 1000;
 	const int verticesPerRect = 6;
 	const int floatsPerVertex = 14; // pos(3) + mass(1) + vel(2) + RV(1) + RV1(1) + RV2(1) + tx(1) + ty(1) + r,g,b (3)
 	std::vector<float> particleData;
 
 	for (int i = 0; i < particleCount; i++) {
-		// °¢ ÆÄÆ¼Å¬¸¶´Ù °íÀ¯ÇÑ ·£´ý ¼Óµµ¸¦ »ý¼º
-		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // ¹üÀ§: -1.0 ~ 1.0
-		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // ¹üÀ§: -1.0 ~ 1.0
-		float RV = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
-		float RV1 = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
-		float RV2 = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
-		float R = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
-		float G = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
-		float B = (rand() % 1001) / 1000.0f; // ¹üÀ§: 0.0 ~ 1.0
+		// ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		float rv_x = ((rand() % 2001) - 1000) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: -1.0 ~ 1.0
+		float rv_y = ((rand() % 2001) - 1000) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: -1.0 ~ 1.0
+		float RV = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
+		float RV1 = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
+		float RV2 = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
+		float R = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
+		float G = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
+		float B = (rand() % 1001) / 1000.0f; // ï¿½ï¿½ï¿½ï¿½: 0.0 ~ 1.0
 
 
-		// »ç°¢Çü Á¤Á¡ 6°³ Á¤ÀÇ (Triangle 2°³)
+		// ï¿½ç°¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 6ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (Triangle 2ï¿½ï¿½)
 		float v[verticesPerRect * floatsPerVertex] = {
 		//triangle1
 		centerX - size / 2, centerY - size / 2,0, mass, rv_x, rv_y, RV, RV1, RV2,0,0,R,G,B,
@@ -198,7 +199,7 @@ void Renderer::CreateVertexBufferObjects()
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
-	//½¦ÀÌ´õ ¿ÀºêÁ§Æ® »ý¼º
+	//ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	GLuint ShaderObj = glCreateShader(ShaderType);
 
 	if (ShaderObj == 0) {
@@ -209,25 +210,25 @@ void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
 	p[0] = pShaderText;
 	GLint Lengths[1];
 	Lengths[0] = strlen(pShaderText);
-	//½¦ÀÌ´õ ÄÚµå¸¦ ½¦ÀÌ´õ ¿ÀºêÁ§Æ®¿¡ ÇÒ´ç
+	//ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½Úµå¸¦ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ò´ï¿½
 	glShaderSource(ShaderObj, 1, p, Lengths);
 
-	//ÇÒ´çµÈ ½¦ÀÌ´õ ÄÚµå¸¦ ÄÄÆÄÀÏ
+	//ï¿½Ò´ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½Úµå¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	glCompileShader(ShaderObj);
 
 	GLint success;
-	// ShaderObj °¡ ¼º°øÀûÀ¸·Î ÄÄÆÄÀÏ µÇ¾ú´ÂÁö È®ÀÎ
+	// ShaderObj ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 	glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		GLchar InfoLog[1024];
 
-		//OpenGL ÀÇ shader log µ¥ÀÌÅÍ¸¦ °¡Á®¿È
+		//OpenGL ï¿½ï¿½ shader log ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
 		fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
 		printf("%s \n", pShaderText);
 	}
 
-	// ShaderProgram ¿¡ attach!!
+	// ShaderProgram ï¿½ï¿½ attach!!
 	glAttachShader(ShaderProgram, ShaderObj);
 }
 
@@ -250,43 +251,43 @@ bool Renderer::ReadFile(char* filename, std::string *target)
 
 GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 {
-	GLuint ShaderProgram = glCreateProgram(); //ºó ½¦ÀÌ´õ ÇÁ·Î±×·¥ »ý¼º
+	GLuint ShaderProgram = glCreateProgram(); //ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-	if (ShaderProgram == 0) { //½¦ÀÌ´õ ÇÁ·Î±×·¥ÀÌ ¸¸µé¾îÁ³´ÂÁö È®ÀÎ
+	if (ShaderProgram == 0) { //ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½Î±×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 		fprintf(stderr, "Error creating shader program\n");
 	}
 
 	std::string vs, fs;
 
-	//shader.vs °¡ vs ¾ÈÀ¸·Î ·ÎµùµÊ
+	//shader.vs ï¿½ï¿½ vs ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
 	if (!ReadFile(filenameVS, &vs)) {
 		printf("Error compiling vertex shader\n");
 		return -1;
 	};
 
-	//shader.fs °¡ fs ¾ÈÀ¸·Î ·ÎµùµÊ
+	//shader.fs ï¿½ï¿½ fs ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
 	if (!ReadFile(filenameFS, &fs)) {
 		printf("Error compiling fragment shader\n");
 		return -1;
 	};
 
-	// ShaderProgram ¿¡ vs.c_str() ¹öÅØ½º ½¦ÀÌ´õ¸¦ ÄÄÆÄÀÏÇÑ °á°ú¸¦ attachÇÔ
+	// ShaderProgram ï¿½ï¿½ vs.c_str() ï¿½ï¿½ï¿½Ø½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ attachï¿½ï¿½
 	AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
 
-	// ShaderProgram ¿¡ fs.c_str() ÇÁ·¹±×¸ÕÆ® ½¦ÀÌ´õ¸¦ ÄÄÆÄÀÏÇÑ °á°ú¸¦ attachÇÔ
+	// ShaderProgram ï¿½ï¿½ fs.c_str() ï¿½ï¿½ï¿½ï¿½ï¿½×¸ï¿½Æ® ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ attachï¿½ï¿½
 	AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
 	GLint Success = 0;
 	GLchar ErrorLog[1024] = { 0 };
 
-	//Attach ¿Ï·áµÈ shaderProgram À» ¸µÅ·ÇÔ
+	//Attach ï¿½Ï·ï¿½ï¿½ shaderProgram ï¿½ï¿½ ï¿½ï¿½Å·ï¿½ï¿½
 	glLinkProgram(ShaderProgram);
 
-	//¸µÅ©°¡ ¼º°øÇß´ÂÁö È®ÀÎ
+	//ï¿½ï¿½Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 
 	if (Success == 0) {
-		// shader program ·Î±×¸¦ ¹Þ¾Æ¿È
+		// shader program ï¿½Î±×¸ï¿½ ï¿½Þ¾Æ¿ï¿½
 		glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
 		std::cout << filenameVS << ", " << filenameFS << " Error linking shader program\n" << ErrorLog;
 		return -1;
@@ -365,7 +366,7 @@ void Renderer::DrawParticles(int count)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	g_time += 0.0003f; // ½Ã°£ ¾÷µ¥ÀÌÆ®
+	g_time += 0.0003f; // ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
 	glUseProgram(m_ParticleShader);
 
@@ -405,7 +406,7 @@ void Renderer::DrawParticles(int count)
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
-	// ÇÑ Á¤Á¡ÀÇ Å©±â´Â float 14°³ (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1 + tx 1 + ty 1 + rgb 3)
+	// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ï¿½ float 14ï¿½ï¿½ (pos 3 + mass 1 + vel 2 + RV 1 + RV1 1 + Lifetime 1 + tx 1 + ty 1 + rgb 3)
 	int stride = 14;
 	glVertexAttribPointer(attribPos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, 0);
 	
@@ -423,7 +424,7 @@ void Renderer::DrawParticles(int count)
 
 	glVertexAttribPointer(attribRGB, 3, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (GLvoid*)(sizeof(float) * 11));
 
-	// 6°³ÀÇ Á¤Á¡ * ÆÄÆ¼Å¬ °³¼ö
+	// 6ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ * ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½
 	glDrawArrays(GL_TRIANGLES, 0, 6 * count);
 
 	glDisableVertexAttribArray(attribPos);
@@ -597,6 +598,11 @@ void Renderer::DrawDummy()
 	int uTime = glGetUniformLocation(shader, "u_Time");
 	glUniform1f(uTime, g_time);
 	g_time += 0.0016;
+
+	int uAhnTex = glGetUniformLocation(shader, "u_AhnTex");
+	glUniform1i(uAhnTex, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_AhnTexture);
 
 	int attribPosition = glGetAttribLocation(m_DummyShader, "a_Pos");
 	glEnableVertexAttribArray(attribPosition);

@@ -70,8 +70,8 @@ void Raindrop(){
 	float accum = 0;
 
 	for (int i = 0; i < 1000; i++) {
-		float lTime = u_DropInfo[i].w; //¶óÀÌÇÁÅ¸ÀÓ
-		float sTime = u_DropInfo[i].z; //½ÃÀÛ ½Ã°£
+		float lTime = u_DropInfo[i].w; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½
+		float sTime = u_DropInfo[i].z; //ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
 		float newTime = u_Time - sTime;
 
 		if (newTime > 0) {
@@ -87,7 +87,7 @@ void Raindrop(){
 
 			float fade = 5 * clamp(range - d, 0, 1);
 
-			float value = pow(abs(sin(d * 2 * c_PI * 8 - t*100)), 16); // 8Àº ¹°¹æ¿ïÀÇ °³¼ö, t´Â ½Ã°£¿¡ µû¸¥ º¯È­·®
+			float value = pow(abs(sin(d * 2 * c_PI * 8 - t*100)), 16); // 8ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, tï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­ï¿½ï¿½
 			accum += value * fade * oneMinus;
 		}
 
@@ -97,36 +97,36 @@ void Raindrop(){
 	FragColor = vec4(accum);
 }
 
-// È¸Àü Çà·ÄÀ» »ý¼ºÇÏ´Â º¸Á¶ ÇÔ¼ö
+// È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 mat2 rotate2d(float angle) {
     return mat2(cos(angle), -sin(angle),
                 sin(angle),  cos(angle));
 }
 
 void FractalPattern() {
-    // 1. ÁÂÇ¥ Á¤±ÔÈ­ (0~1 ¹üÀ§¸¦ -1~1 ¹üÀ§·Î º¯°æÇÏ¿© Áß¾Ó Á¤·Ä)
+    // 1. ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½È­ (0~1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -1~1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ï¿½)
     vec2 uv = (v_TPos - 0.5) * 2.0;
     
-    // ½Ã°£ÀÇ Èå¸§¿¡ µû¶ó ÀüÃ¼ÀûÀÎ È¸Àü Ãß°¡
+    // ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½å¸§ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ß°ï¿½
     uv *= rotate2d(u_Time * 0.2);
 
     vec3 finalColor = vec3(0.0);
 
-    // 2. ÇÁ·¢Å» ¹Ýº¹ ·çÇÁ (·çÇÁ È½¼ö°¡ ¸¹¾ÆÁú¼ö·Ï º¹ÀâÇØÁü)
+    // 2. ï¿½ï¿½ï¿½ï¿½Å» ï¿½Ýºï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
     for (float i = 0.0; i < 4.0; i++) {
-        // ÁÂÇ¥ º¹Á¦ (È­¸éÀ» ÂÉ°³±â)
+        // ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ (È­ï¿½ï¿½ï¿½ï¿½ ï¿½É°ï¿½ï¿½ï¿½)
         uv = fract(uv * 1.5) - 0.5;
 
-        // ¿øÇü °Å¸® °è»ê (Circle2ÀÇ °Å¸® °³³ä ÀÀ¿ë)
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ (Circle2ï¿½ï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         float d = length(uv) * exp(-length(v_TPos - 0.5));
 
-        // »ö»ó °áÁ¤ (À§Ä¡¿Í ½Ã°£¿¡ µû¸¥ º¯È­)
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­)
         vec3 col = 0.5 + 0.5 * cos(u_Time + i * 0.5 + vec3(0, 2, 4));
 
-        // ³×¿Â ¶óÀÎ È¿°ú (LinePatternÀÇ sin/pow °³³ä ÀÀ¿ë)
+        // ï¿½×¿ï¿½ ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ (LinePatternï¿½ï¿½ sin/pow ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         d = sin(d * 8.0 + u_Time) / 8.0;
         d = abs(d);
-        d = pow(0.01 / d, 1.2); // ºû³ª´Â ¼± È¿°ú
+        d = pow(0.01 / d, 1.2); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È¿ï¿½ï¿½
 
         finalColor += col * d;
     }
@@ -135,12 +135,12 @@ void FractalPattern() {
 }
 
 void Flag() {
-	float amp = 0.5; // ÁøÆø
+	float amp = 0.5; // ï¿½ï¿½ï¿½ï¿½
 	float speed = 15;
 	float sinInput = v_TPos.x * c_PI * 2 - u_Time * speed;
 	float sinValue = v_TPos.x * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
 
-	float fWidth = 0.0; // ±ê¹ß ³¡ ºÎºÐ Æø ¼³Á¤
+	float fWidth = 0.0; // ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Îºï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float width = 0.5 * mix(1, fWidth, v_TPos.x);
 	float grey = 0;
 
@@ -159,13 +159,13 @@ void Flag() {
 }
 
 void Flame() {
-	float amp = 0.5; // ÁøÆø
+	float amp = 0.5; // ï¿½ï¿½ï¿½ï¿½
 	float speed = 15;
 	float newY = 1 - v_TPos.y;
 	float sinInput = newY * c_PI * 2 - u_Time * speed;
 	float sinValue = newY * amp * ((sin(sinInput) + 1) / 2 - 0.5) + 0.5;
 
-	float fWidth = 0.0; // ±ê¹ß ³¡ ºÎºÐ Æø ¼³Á¤
+	float fWidth = 0.0; // ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Îºï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float width = 0.5 * mix(fWidth, 1, newY);
 	float grey = 0;
 
@@ -206,7 +206,7 @@ void TextureSampling() {
 
 void TextureQ1() {
 	float tx = v_TPos.x;
-	float ty = 1 - 2 * abs(v_TPos.y - 0.5); // yÁÂÇ¥¸¦ 0~1 ¹üÀ§¿¡¼­ 0~1~0 ¹üÀ§·Î º¯È¯
+	float ty = 1 - 2 * abs(v_TPos.y - 0.5); // yï¿½ï¿½Ç¥ï¿½ï¿½ 0~1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0~1~0 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 	vec2 newTex = vec2(tx, ty);
 
 	FragColor = texture(u_RGBTex, newTex);
@@ -237,7 +237,7 @@ void TextureQ3() {
 }
 
 void TextureQ4() {
-	float resolX = 5; //¹Ýº¹µÇ´Â °³¼ö
+	float resolX = 5; //ï¿½Ýºï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float resolY = 5;
 	float shear = 0.5 * u_Time;
 
@@ -299,17 +299,17 @@ void FS_01_Q7() {
 }
 
 void FS_01_Q8() {
-	float tx = v_TPos.x/5; //¹üÀ§¸¸
+	float tx = v_TPos.x/5; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float ty = v_TPos.y/2;
-	float offsetX = 2.0/5.0; //À§Ä¡
+	float offsetX = 2.0/5.0; //ï¿½ï¿½Ä¡
 	float offsetY = 1.0/2.0;
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
 }
 
 void FS_01_Q9() {
-	float tx = v_TPos.x/5 * 2; //¹üÀ§¸¸
+	float tx = v_TPos.x/5 * 2; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float ty = v_TPos.y/2;
-	float offsetX = 2.0/5.0; //À§Ä¡
+	float offsetX = 2.0/5.0; //ï¿½ï¿½Ä¡
 	float offsetY = 0;
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));
 }
@@ -317,10 +317,10 @@ void FS_01_Q9() {
 void FS_01_Q10() {
 	float index = float(8);
 
-	float tx = v_TPos.x/5; //¹üÀ§¸¸
+	float tx = v_TPos.x/5; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	float ty = v_TPos.y/2;
 
-	float offsetX = fract(index/5.0); //À§Ä¡, fract: ¼Ò¼öºÎºÐ¸¸ ³²±è
+	float offsetX = fract(index/5.0); //ï¿½ï¿½Ä¡, fract: ï¿½Ò¼ï¿½ï¿½ÎºÐ¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float offsetY = floor(index/5.0)/2.0;
 
 	FragColor = texture(u_NumsTex, vec2(tx+offsetX, ty+offsetY));

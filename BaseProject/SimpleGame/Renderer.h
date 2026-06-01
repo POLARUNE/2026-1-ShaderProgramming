@@ -61,6 +61,8 @@ private:
 	GLuint m_ParticleTexture = 0;
 	GLuint m_ParticleSpriteTexture = 0;
 
+	GLuint m_AhnTexture = 0;
+
 	//Dummy Vertex
 	GLuint m_VBODummy = 0;
 	GLuint m_VBODummyCount = 0;
