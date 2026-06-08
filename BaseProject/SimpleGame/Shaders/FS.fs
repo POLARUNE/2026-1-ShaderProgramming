@@ -1,6 +1,10 @@
 #version 330
 
 layout(location=0) out vec4 FragColor;
+layout(location=1) out vec4 FragColor1;
+layout(location=2) out vec4 FragColor2;
+
+
 
 in vec2 v_TPos;
 
@@ -26,7 +30,7 @@ void Simple(){
 	}
 }
 
-void LinePattern(){
+vec4 LinePattern(){
 	//FragColor = vec4(v_TPos, 0, 1);
 	float lineCountH = 10;
 	float lineCountV = 5;
@@ -38,7 +42,7 @@ void LinePattern(){
 
 	float grey = pow(abs(sin((v_TPos.y*2*c_PI+per)*lineCountH)), lineWidth);
 	float grey1 = pow(abs(sin((v_TPos.x*2*c_PI+per)*lineCountV)), lineWidth);
-	FragColor = vec4(grey+grey1);
+	return vec4(grey+grey1);
 }
 
 void Circle1(){
@@ -66,7 +70,7 @@ void Circle2(){
 	FragColor = vec4(pow(value, 16));
 }
 
-void Raindrop(){
+vec4 Raindrop(){
 	float accum = 0;
 
 	for (int i = 0; i < 1000; i++) {
@@ -94,7 +98,8 @@ void Raindrop(){
 		else {
 		}
 	}
-	FragColor = vec4(accum);
+	//FragColor = vec4(accum);
+	return vec4(accum);
 }
 
 // 회전 행렬을 생성하는 보조 함수
@@ -134,7 +139,7 @@ void FractalPattern() {
     FragColor = vec4(finalColor, 1.0);
 }
 
-void Flag() {
+vec4 Flag() {
 	float amp = 0.5; // 진폭
 	float speed = 15;
 	float sinInput = v_TPos.x * c_PI * 2 - u_Time * speed;
@@ -152,10 +157,9 @@ void Flag() {
 
 	else {
 		grey = 0;
-		discard;
 	}
 
-	FragColor = vec4(grey);
+	return vec4(grey);
 }
 
 void Flame() {
@@ -329,6 +333,10 @@ void FS_01_Q10() {
 void main()
 {
 	//Nums();
-	FS_01_Q10();
+	//FS_01_Q10();
 	//FractalPattern();
+	FragColor = Raindrop();
+	FragColor1 = Flag();
+	FragColor2 = LinePattern();
+
 }

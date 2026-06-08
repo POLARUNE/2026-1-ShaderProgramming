@@ -24,13 +24,24 @@ C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기
 C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(640,36): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
   
-C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(777,38): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(825,38): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
   
-C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(778,36): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(826,36): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
   
-C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(779,38): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(827,38): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
   (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
   
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(848,43): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(849,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\SimpleGame\Renderer.cpp(850,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+  (소스 파일 '/Renderer.cpp'을(를) 컴파일하는 중)
+  
+  SimpleGame.cpp
+  코드를 생성하고 있습니다...
   SimpleGame.vcxproj -> C:\Users\이진수\Documents\대학 수업 자료 및 과제\전공\2026 1학기 셰이더프로그래밍\2026-1-ShaderProgramming\BaseProject\x64\Debug\SimpleGame.exe
