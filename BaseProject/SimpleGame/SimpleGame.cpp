@@ -29,7 +29,8 @@ void RenderScene(void)
 	//g_Renderer->DrawFS();
 	//g_Renderer->DrawDummy_FBO();
 	//g_Renderer->DrawAll_FBO();
-	g_Renderer->DrawMultipleRenderTarget();
+	//g_Renderer->DrawMultipleRenderTarget();
+	g_Renderer->DrawTriangle_Bloom();
 	glutSwapBuffers();
 }
 

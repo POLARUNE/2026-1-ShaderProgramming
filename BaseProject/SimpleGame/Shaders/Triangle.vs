@@ -176,6 +176,9 @@ void RoundFalling()
 		gl_Position = vec4(-1000, -1000, 0, 1);
 		return;
 	}
+
+	v_Color = a_RGB;
+	v_Tex = a_Tex;
 }
 
 void RoundPop() 
@@ -276,9 +279,9 @@ void Shape()
 void main()
 {
 	//Falling();
-	//RoundFalling();
+	RoundFalling();
 	//RoundPop2();
 	//sin3();
-	Shape();
+	//Shape();
 	
 }

@@ -79,5 +79,17 @@
     <None Include="Shaders\Texture.vs">
       <Filter>소스 파일\Shaders</Filter>
     </None>
+    <None Include="Shaders\BlurH.fs">
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
+    <None Include="Shaders\BlurH.vs">
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
+    <None Include="Shaders\BlurV.fs">
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
+    <None Include="Shaders\BlurV.vs">
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

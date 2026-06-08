@@ -29,6 +29,8 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_FSShader = CompileShaders("./Shaders/FS.vs", "./Shaders/FS.fs");
 	m_DummyShader = CompileShaders("./Shaders/Dummy.vs", "./Shaders/Dummy.fs");
 	m_TextureShader = CompileShaders("./Shaders/Texture.vs", "./Shaders/Texture.fs");
+	m_BlurH_Shader = CompileShaders("./Shaders/BlurH.vs", "./Shaders/BlurH.fs");
+	m_BlurV_Shader = CompileShaders("./Shaders/BlurV.vs", "./Shaders/BlurV.fs");
 
 	//Load Textures
 	m_RgbTexture = CreatePngTexture("./Textures/rgb.png", GL_NEAREST); // 0 slot
@@ -125,7 +127,7 @@ void Renderer::CreateVertexBufferObjects()
 
 	float centerX = 0;
 	float centerY = 0;
-	float size = 0.3; // size: 사각형 길이의 절반
+	float size = 0.2; // size: 사각형 길이의 절반
 	float mass = 1;
 	float vx = 1;
 	float vy = 1;
@@ -217,6 +219,9 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_TextureVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_TextureVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texRect), texRect, GL_STATIC_DRAW);
+
+	//=====================================================================
+
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -382,12 +387,13 @@ void Renderer::DrawTriangle()
 	glDisableVertexAttribArray(attribVel);
 }
 
+
 void Renderer::DrawParticles(int count)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	g_time += 0.0003f; // 시간 업데이트
+	g_time += 0.0016f; // 시간 업데이트
 
 	glUseProgram(m_ParticleShader);
 
@@ -713,6 +719,10 @@ void Renderer::GenFBOs()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FBO_Texture1, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		assert(0);
+	}
 	//======================================================================
 	glGenTextures(1, &m_FBO_Texture2);
 	glBindTexture(GL_TEXTURE_2D, m_FBO_Texture2);
@@ -735,11 +745,10 @@ void Renderer::GenFBOs()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FBO_Texture2, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		assert(0);
 	}
-
 	//======================================================================
 	glGenTextures(1, &m_MRT_FBO_Texture0);
 	glBindTexture(GL_TEXTURE_2D, m_MRT_FBO_Texture0);
@@ -782,6 +791,62 @@ void Renderer::GenFBOs()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_MRT_FBO_Texture1, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_MRT_FBO_Texture2, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, MRTdepthBuffer);
+
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		assert(0);
+	}
+
+	//=====================================================================
+
+	glGenTextures(1, &m_MRT_HDR_FBO_High_Texture);
+	glBindTexture(GL_TEXTURE_2D, m_MRT_HDR_FBO_High_Texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 512, 512, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glGenTextures(1, &m_MRT_HDR_FBO_Low_Texture);
+	glBindTexture(GL_TEXTURE_2D, m_MRT_HDR_FBO_Low_Texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 512, 512, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glGenFramebuffers(1, &m_MRT_HDR_FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_MRT_HDR_FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_MRT_HDR_FBO_Low_Texture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_MRT_HDR_FBO_High_Texture, 0);
+
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		assert(0);
+	}
+
+	//=====================================================================
+
+	glGenFramebuffers(2, m_PingPongFBO);
+	glGenTextures(2, m_PingPongTexture);
+
+	for (int i = 0; i < 2; i++) {
+		glBindTexture(GL_TEXTURE_2D, m_PingPongTexture[i]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 512, 512, 0, GL_RGBA, GL_FLOAT, NULL);
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_PingPongFBO[i]);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PingPongTexture[i], 0);
+
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			assert(0);
+		}
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -848,4 +913,59 @@ void Renderer::DrawMultipleRenderTarget()
 	DrawTexture(m_MRT_FBO_Texture0, -0.5, 0, 0.3, false);
 	DrawTexture(m_MRT_FBO_Texture1, 0.0, 0, 0.3, false);
 	DrawTexture(m_MRT_FBO_Texture2, 0.5, 0, 0.3, false);
+}
+
+
+void Renderer::DrawTriangle_Bloom()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_MRT_HDR_FBO);
+	GLenum DrawBuffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, DrawBuffers);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearDepth(1.f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glViewport(0, 0, 512, 512);
+
+	DrawParticles(1000);
+
+	DrawGaussianBlur(m_MRT_HDR_FBO_High_Texture, m_PingPongFBO[0], m_BlurH_Shader);
+
+	for (int i = 0; i < 20; i++) {
+		DrawGaussianBlur(m_PingPongTexture[0], m_PingPongFBO[1], m_BlurV_Shader);
+		DrawGaussianBlur(m_PingPongTexture[1], m_PingPongFBO[0], m_BlurH_Shader);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 1024, 1024);
+
+	GLenum ResetDrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, ResetDrawBuffers);
+
+	DrawTexture(m_MRT_HDR_FBO_Low_Texture, -0.5, 0.5, 0.5, false);
+	DrawTexture(m_MRT_HDR_FBO_High_Texture, 0.5, 0.5, 0.5, false);
+	DrawTexture(m_PingPongTexture[0], -0.5, -0.5, 0.5, true);
+	DrawTexture(m_PingPongTexture[1], 0.5, -0.5, 0.5, false);
+
+}
+
+void Renderer::DrawGaussianBlur(GLuint texID, GLuint targetFBOID, GLuint shader)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, targetFBOID);
+	glUseProgram(shader);
+
+	GLuint posLoc = glGetAttribLocation(shader, "a_Pos");
+	glEnableVertexAttribArray(posLoc);
+	GLuint texLoc = glGetAttribLocation(shader, "a_Tex");
+	glEnableVertexAttribArray(texLoc);
+	glUniform1i(glGetUniformLocation(shader, "u_Texture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

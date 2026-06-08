@@ -1,6 +1,7 @@
 #version 330
 
 layout(location=0) out vec4 FragColor;
+layout(location=1) out vec4 FragColor1;
 
 in float v_Grey;
 in vec2 v_Tex;
@@ -44,7 +45,32 @@ void AnimTexture()
 	FragColor.a *= value;
 }
 
+void CircleShapeHDR(){
+	vec4 newColor;
+
+	float d = distance(vec2(0.5,0.5), v_Tex);
+
+	if (d < 0.5) {
+		newColor = vec4(v_Color*1.5, clamp(0.5-d, 0, 0.5)*2.0);
+	}
+	else {
+		newColor= vec4(0);
+	}
+
+	float brightness = dot(newColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+
+	FragColor = newColor;
+
+	if(brightness > 1.0){
+		FragColor1 = newColor;
+	}	
+	else{
+		FragColor1 = vec4(0);
+	}
+}
+
 void main()
 {
-	AnimTexture();
+	//AnimTexture();
+	CircleShapeHDR();
 }
